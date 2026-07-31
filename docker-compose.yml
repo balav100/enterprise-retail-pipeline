@@ -1,0 +1,40 @@
+services:
+
+  postgres:
+
+    image: postgres:17
+
+    container_name: retail_postgres
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: retail_dw
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  dashboard:
+
+    build: .
+
+    container_name: retail_dashboard
+
+    depends_on:
+      - postgres
+
+    ports:
+      - "8501:8501"
+
+    environment:
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: retail_dw
+
+volumes:
+  postgres_data:

@@ -1,40 +1,33 @@
+version: '3.8'
+
 services:
-
   postgres:
-
-    image: postgres:17
-
+    image: postgres:15
     container_name: retail_postgres
-
+    restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: retail_dw
-
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-retail_dw}
     ports:
       - "5432:5432"
-
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d # Optional: auto-runs initial SQL scripts
 
   dashboard:
-
     build: .
-
     container_name: retail_dashboard
-
-    depends_on:
-      - postgres
-
     ports:
       - "8501:8501"
-
     environment:
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: retail_dw
+      - DB_HOST=postgres
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-retail_dw}
+    depends_on:
+      - postgres
 
 volumes:
   postgres_data:
